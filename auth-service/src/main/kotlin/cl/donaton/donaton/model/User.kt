@@ -1,13 +1,22 @@
-// Entidad de Dominio
-data class User(val id: Long, val username: String, val passwordHash: String)
+// Dominio
+data class User(
+    val id: Long,
+    val username: String,
+    val password: String, // Hash a futuro
+    val role: String
+)
 
-// Interfaz del Repositorio
+// Patron Repository: Interfaz clara de acceso a datos
 interface UserRepository {
     fun findByUsername(username: String): User?
 }
 
-// Implementación con JPA (Simulada)
+// Implementación (Simulada para desarrollo)
 @Repository
-class PostgresUserRepository(private val jpaRepo: JpaUserInterface) : UserRepository {
-    override fun findByUsername(username: String): User? = jpaRepo.findByUsername(username)
+class InMemoryUserRepository : UserRepository {
+    private val users = listOf(
+        User(1, "admin", "1234", "ADMIN"),
+        User(2, "voluntario", "pass123", "LOGISTICA")
+    )
+    override fun findByUsername(username: String) = users.find { it.username == username }
 }

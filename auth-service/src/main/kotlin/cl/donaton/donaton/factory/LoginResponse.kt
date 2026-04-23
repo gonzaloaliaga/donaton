@@ -1,12 +1,17 @@
-// Producto de la Factory
-data class LoginResponse(val token: String, val username: String)
+// El objeto que se crea
+data class AuthResponse(
+    val username: String,
+    val status: String,
+    val message: String
+)
 
 // La Factory
 object AuthResponseFactory {
-    fun createResponse(user: User, token: String): LoginResponse {
-        return LoginResponse(
-            token = token,
-            username = user.username,
-        )
+    fun createSuccessResponse(username: String): AuthResponse {
+        return AuthResponse(username, "SUCCESS", "Bienvenido a Donaton")
+    }
+
+    fun createFailureResponse(): AuthResponse {
+        return AuthResponse("unknown", "FAILURE", "Credenciales incorrectas")
     }
 }
