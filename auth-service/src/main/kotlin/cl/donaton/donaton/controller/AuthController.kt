@@ -1,3 +1,16 @@
+package cl.donaton.donaton.controller
+
+import cl.donaton.donaton.factory.AuthResponse
+import cl.donaton.donaton.factory.AuthResponseFactory
+import cl.donaton.donaton.model.UserRepository
+import cl.donaton.donaton.strategy.AuthenticationStrategy
+import cl.donaton.donaton.strategy.SimplePasswordStrategy
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(private val userRepository: UserRepository) {

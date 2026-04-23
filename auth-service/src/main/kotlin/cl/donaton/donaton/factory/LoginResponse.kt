@@ -1,3 +1,5 @@
+package cl.donaton.donaton.factory
+
 // El objeto que se crea
 data class AuthResponse(
     val username: String,

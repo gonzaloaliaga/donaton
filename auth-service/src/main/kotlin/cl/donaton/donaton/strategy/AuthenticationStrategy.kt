@@ -1,3 +1,5 @@
+package cl.donaton.donaton.strategy
+
 // Interfaz de la Estrategia
 interface AuthenticationStrategy {
     fun authenticate(inputPass: String, userPass: String): Boolean

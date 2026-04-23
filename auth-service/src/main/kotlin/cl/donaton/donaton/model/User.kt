@@ -1,3 +1,7 @@
+package cl.donaton.donaton.model
+
+import org.springframework.stereotype.Repository
+
 // Dominio
 data class User(
     val id: Long,
