@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository
 // Dominio
 data class User(
     val id: Long,
-    val username: String,
+    var username: String,
     val password: String, // Hash a futuro
     val role: String
 )
@@ -18,9 +18,17 @@ interface UserRepository {
 // Implementación (Simulada para desarrollo)
 @Repository
 class InMemoryUserRepository : UserRepository {
-    private val users = listOf(
+    private val users = mutableListOf(
         User(1, "admin", "1234", "ADMIN"),
         User(2, "voluntario", "pass123", "LOGISTICA")
     )
     override fun findByUsername(username: String) = users.find { it.username == username }
+
+    fun update(username: String, newUsername: String): User? {
+        val user = findByUsername(username)
+        user?.let {
+            it.username = newUsername
+        }
+        return user
+    }
 }

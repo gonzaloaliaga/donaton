@@ -5,17 +5,42 @@ export default function Profile() {
     const { user, setUser, logout } = useContext(AuthContext);
     const [newName, setNewName] = useState('');
 
+    const handleUpdateName = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/update-username', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentUsername: user,
+                    newUsername: newName
+                })
+            });
+
+            if (response.ok) {
+                setUser(newName); // Actualiza el estado global de React
+                alert("¡Nombre actualizado en el servidor!");
+            } else {
+                alert("Error al actualizar");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
     return (
         <div>
-            <nav style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ background: 'blue', color: 'white', borderRadius: '50%', width: '40px', textAlign: 'center' }}>
-                    {user?.charAt(0).toUpperCase()} {/* Avatar: primera letra del username */}
-                </div>
-                <button onClick={logout}>Cerrar Sesión</button>
-            </nav>
+            {/* ... tu nav ... */}
             <h1>Bienvenido, {user}</h1>
-            <input placeholder="Nuevo username" onChange={(e) => setNewName(e.target.value)} />
-            <button onClick={() => setUser(newName)}>Guardar Cambios</button>
+            <div style={{ marginTop: '20px' }}>
+                <input
+                    placeholder="Nuevo username"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                />
+                <button onClick={handleUpdateName}>Guardar Cambios en Backend</button>
+
+                <button onClick={logout}>Cerrar sesión</button>
+            </div>
         </div>
     );
 }
