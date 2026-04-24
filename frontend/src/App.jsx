@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useContext } from 'react';
+import { AuthProvider, AuthContext } from './context/AuthContext';
+import Login from './components/Login';
+import Profile from './components/Profile';
 
-function App() {
-
-  return (
-    <>
-      <Text>Hola probando 123</Text>
-    </>
-  )
+function Content() {
+    const { user } = useContext(AuthContext);
+    return user ? <Profile /> : <Login />;
 }
 
-export default App
+export default function App() {
+    return (
+        <AuthProvider>
+            <Content />
+        </AuthProvider>
+    );
+}
