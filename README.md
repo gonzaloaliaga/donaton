@@ -1,19 +1,21 @@
 # 🏗️ Patrones de Arquitectura y Diseño
 ## Backend (Kotlin / Spring Boot)
-El backend implementa patrones de diseño del "Gang of Four" para asegurar la escalabilidad y el desacoplamiento del código:
+El backend utiliza patrones estructurales y de comportamiento para gestionar la seguridad y la respuesta lógica del sistema de emergencias:
 
-**Patrón Strategy (Estrategia)**: Se utiliza para gestionar diferentes métodos de autenticación. Actualmente implementa una SimplePasswordStrategy para validación de texto plano, dejando la estructura lista para integrar SecurePasswordStrategy con encriptación en el futuro.
+**Patrón Strategy (Estrategia)**: Implementado mediante RoleBasedAuthenticationStrategy. Este patrón centraliza las reglas de validación de acceso, permitiendo aplicar políticas de seguridad diferenciadas según el rol del usuario (ADMIN, LOGISTIC, VOLUNTEER, DONOR). Facilita la futura integración de hashing (BCrypt) sin alterar el flujo del controlador.
 
-**Patrón Factory (Fábrica)**: Implementado en AuthResponseFactory, este patrón se encarga de centralizar la creación de objetos de respuesta (AuthResponse), permitiendo que el controlador no se preocupe por la construcción lógica de los mensajes de éxito o error.
+**Patrón Factory (Fábrica)**: Localizado en AuthResponseFactory. Se encarga de la creación lógica del objeto AuthResponse, vinculando el rol del usuario con su correspondiente "Estrategia de Dashboard" (dashboardType). Esto asegura que el backend determine la experiencia de usuario de forma centralizada.
 
-**Patrón Repository (Repositorio)**: Utilizado para mediar entre el dominio del usuario y la persistencia de datos. La interfaz UserRepository permite gestionar el acceso a los datos de forma independiente a la tecnología de base de datos utilizada.
+**Patrón Repository (Repositorio)**: Representado por la interfaz UserRepository. Actúa como una capa de abstracción entre la lógica de negocio y el origen de los datos. Esta mediación permite gestionar el acceso y la actualización de la información de forma independiente a la tecnología de persistencia utilizada, facilitando la escalabilidad y el mantenimiento del sistema.
 
 ## Frontend (React / Vite)
 El frontend se basa en una arquitectura modular y reactiva:
 
-**Patrón Provider / Context (Contexto)**: Implementado mediante AuthContext, este patrón permite gestionar el estado de autenticación de forma global. Cualquier componente puede acceder a la información del usuario logueado sin necesidad de pasar "props" manualmente.
+**Patrón Provider / Context (Contexto)**: Mediante AuthContext, se gestiona un estado global complejo que almacena la identidad, el rol y los permisos del usuario. Esto elimina el prop drilling y garantiza la integridad de la sesión en toda la plataforma.
 
-**Arquitectura Modular Basada en Componentes**: La aplicación está dividida en módulos independientes y reutilizables como Login y Profile, lo que facilita el mantenimiento y la expansión de la interfaz.
+**Arquitectura Modular Basada en Componentes**: Se ha implementado una capa de servicios (authService.js) que encapsula toda la lógica de comunicación con la API. Los componentes no conocen detalles de red, lo que permite un mantenimiento simplificado y alta reutilización de código.
+
+**Strategy Mapping (UI)**: El sistema utiliza un mapeo de componentes para renderizar dashboards especializados según el rol. Esto permite que la vista de perfil (Profile) delegue la interfaz específica a módulos independientes (AdminDashboard, DonorDashboard, etc.), cumpliendo con el principio de responsabilidad única.
 
 # 📈 Metodología de Trabajo: Git Flow
 Para la gestión del código fuente, hemos adoptado el arquetipo Git Flow, organizando el desarrollo en las siguientes ramas:
@@ -44,4 +46,4 @@ npm install
 npm run dev
 ```
 
-Aún no testeado en Linux/macOS.
+**Nota**: Se require configurar el Proxy en frontend/vite.config.js para apuntar al puerto 8080 del backend. Proyecto aún no testeado en Linux/macOS.
