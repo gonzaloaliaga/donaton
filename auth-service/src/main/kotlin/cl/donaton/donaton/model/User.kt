@@ -19,8 +19,10 @@ interface UserRepository {
 @Repository
 class InMemoryUserRepository : UserRepository {
     private val users = mutableListOf(
-        User(1, "admin", "1234", "ADMIN"),
-        User(2, "voluntario", "pass123", "LOGISTICA")
+        User(1, "admin", "1111", "ADMIN"),
+        User(2, "logistic", "2222", "LOGISTIC"),
+        User(3, "volunteer", "3333", "VOLUNTEER"),
+        User(4, "donor", "4444", "DONOR")
     )
     override fun findByUsername(username: String) = users.find { it.username == username }
 
