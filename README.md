@@ -46,4 +46,4 @@ npm install
 npm run dev
 ```
 
-**Nota**: Se require configurar el Proxy en frontend/vite.config.js para apuntar al puerto 8080 del backend. Proyecto aún no testeado en Linux/macOS.
+**Nota**: Proyecto aún no testeado en Linux/macOS.
