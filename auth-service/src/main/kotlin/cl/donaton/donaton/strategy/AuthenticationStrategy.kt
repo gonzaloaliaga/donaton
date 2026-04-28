@@ -1,21 +1,30 @@
 package cl.donaton.donaton.strategy
 
-// Interfaz de la Estrategia
+import cl.donaton.donaton.model.User
+
 interface AuthenticationStrategy {
-    fun authenticate(inputPass: String, userPass: String): Boolean
+    // Recibe el objeto User completo para validar según sus atributos
+    fun authenticate(inputPass: String, user: User): Boolean
 }
 
-// Estrategia 1: Validación simple de texto plano (lo que pediste)
-class SimplePasswordStrategy : AuthenticationStrategy {
-    override fun authenticate(inputPass: String, userPass: String): Boolean {
-        return inputPass == userPass
+class RoleBasedAuthenticationStrategy : AuthenticationStrategy {
+    override fun authenticate(inputPass: String, user: User): Boolean {
+        val isPasswordCorrect = inputPass == user.password
+        
+        // Lógica de estrategia según rol:
+        return when (user.role) {
+            "ADMIN" -> isPasswordCorrect && inputPass.length >= 4 // Los admin deben tener claves de min 4
+            "LOGISTIC" -> isPasswordCorrect // Logística validación estándar
+            "VOLUNTEER" -> isPasswordCorrect // Voluntarios validación estándar
+            "DONOR" -> isPasswordCorrect // Donantes validación estándar
+            else -> false
+        }
     }
 }
 
-// Estrategia 2: (Para el futuro) Validación con Hash/BCrypt
-class SecurePasswordStrategy : AuthenticationStrategy {
-    override fun authenticate(inputPass: String, userPass: String): Boolean {
-        // Aquí iría la lógica de BCrypt.check()
-        return false 
+// Se mantiene para volver a usarla en pruebas
+class SimplePasswordStrategy : AuthenticationStrategy {
+    override fun authenticate(inputPass: String, user: User): Boolean {
+        return inputPass == user.password
     }
 }
