@@ -5,6 +5,7 @@ import cl.donaton.donaton.factory.AuthResponseFactory
 import cl.donaton.donaton.model.InMemoryUserRepository
 import cl.donaton.donaton.model.UserRepository
 import cl.donaton.donaton.strategy.AuthenticationStrategy
+import cl.donaton.donaton.strategy.RoleBasedAuthenticationStrategy
 import cl.donaton.donaton.strategy.SimplePasswordStrategy
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,21 +20,23 @@ import org.springframework.web.bind.annotation.CrossOrigin
 class AuthController(private val userRepository: UserRepository) {
 
     // Elegimos la estrategia (Podría inyectarse por configuración)
-    private val authStrategy: AuthenticationStrategy = SimplePasswordStrategy()
+    private val authStrategy: AuthenticationStrategy = RoleBasedAuthenticationStrategy()
 
     @PostMapping("/login")
-    fun login(@RequestBody loginRequest: Map<String, String>): ResponseEntity<AuthResponse> {
+    fun login(@RequestBody loginRequest: Map<String, String>): ResponseEntity<Any> {
         val username = loginRequest["username"] ?: ""
         val password = loginRequest["password"] ?: ""
 
         val user = userRepository.findByUsername(username)
 
-        return if (user != null && authStrategy.authenticate(password, user.password)) {
-            // Usamos la Factory para la respuesta exitosa
-            ResponseEntity.ok(AuthResponseFactory.createSuccessResponse(user.username))
+        // Usamos la estrategia: pasamos password y el objeto user encontrado
+        return if (user != null && authStrategy.authenticate(password, user)) {
+            // ÉXITO: La Factory construye el objeto con el DashboardType correcto
+            val response = AuthResponseFactory.createSuccessResponse(user)
+            ResponseEntity.ok(response)
         } else {
-            // Usamos la Factory para el error
-            ResponseEntity.status(401).body(AuthResponseFactory.createFailureResponse())
+            // ERROR:
+            ResponseEntity.status(401).body(mapOf("message" to "Credenciales incorrectas"))
         }
     }
 
