@@ -5,13 +5,13 @@ Realizado en draw.io
 # 💻 Stack Tecnológico
 
 ## Frontend
-* **React:** Biblioteca principal para la construcción de interfaces de usuario interactivas.
+* **React 19.2.5:** Biblioteca principal para la construcción de interfaces de usuario interactivas.
 * **Vite:** Entorno de desarrollo ultrarrápido y empaquetador para el frontend.
 * **Context API:** Herramienta nativa de React utilizada para la gestión del estado global (evitando el uso de dependencias externas pesadas).
 
 ## Backend
-* **Kotlin:** Lenguaje de programación principal, elegido por su seguridad, concisión y modernidad.
-* **Spring Boot:** Framework base para la creación de la API REST y la gestión de microservicios.
+* **Kotlin 2.2.21:** Lenguaje de programación principal, elegido por su seguridad, concisión y modernidad.
+* **Spring Boot 4.0.5:** Framework base para la creación de la API REST y la gestión de microservicios.
 * **JDK 21:** Versión de soporte a largo plazo (LTS) utilizada como entorno de ejecución.
 
 ## Infraestructura y Datos
