@@ -6,6 +6,7 @@ Realizado en draw.io
 
 ## Frontend
 * **React 19.2.5:** Biblioteca principal para la construcción de interfaces de usuario interactivas.
+* **Node 24.15.0:** Entorno de ejecución para JavaScript utilizado para la gestión de dependencias y el servidor de desarrollo.
 * **Vite:** Entorno de desarrollo ultrarrápido y empaquetador para el frontend.
 * **Context API:** Herramienta nativa de React utilizada para la gestión del estado global (evitando el uso de dependencias externas pesadas).
 
