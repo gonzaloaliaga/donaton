@@ -1,5 +1,5 @@
 # Arquitectura del sistema
-![Diagrama de Arquitectura](./docs/diagrama_sistema.png)
+![Diagrama de Arquitectura](./docs/diagrama_sistema.jpg)
 Realizado en draw.io
 
 # 💻 Stack Tecnológico
