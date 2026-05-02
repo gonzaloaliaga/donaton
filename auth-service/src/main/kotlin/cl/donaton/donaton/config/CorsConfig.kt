@@ -17,7 +17,7 @@ class CorsConfig {
                         "http://localhost", 
                         "http://127.0.0.1"  // Añadir 127.0.0.1 por si Vite usa esa IP
                     )
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // OPTIONS es vital aquí
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true)
             }
