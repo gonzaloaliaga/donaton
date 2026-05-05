@@ -5,24 +5,71 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Configuración para H2 en memoria
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:donaton_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=
       - SPRING_H2_CONSOLE_ENABLED=true
 
-  frontend:
-    build: ./frontend
-    container_name: donaton-frontend
+  users-service:
+    build: ./users-service
+    container_name: users-service
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:users_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+
+  donations-service:
+    build: ./donations-service
+    container_name: donations-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:donations_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:inventory_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+
+  logistic-service:
+    build: ./logistic-service
+    container_name: logistic-service
+    ports:
+      - "8084:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:logistic_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+
+  frontend-service:
+    build: ./frontend-service
+    container_name: frontend-service
     ports:
       - "80:80"
     depends_on:
       - auth-service
+      - users-service
+      - donations-service
+      - inventory-service
+      - logistic-service
 
   # Futura base de datos (Comentar/Descomentar según se necesite)
   # db:
-  #   image: postgres:18
+  #   image: postgres:16
   #   container_name: donaton-db
   #   environment:
   #     POSTGRES_DB: donaton_db
