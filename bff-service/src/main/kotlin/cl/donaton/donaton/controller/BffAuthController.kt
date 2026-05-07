@@ -1,28 +1,58 @@
 package cl.donaton.donaton.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = ["http://localhost:5173"]) // Frontend (Vite)
+@CrossOrigin(origins = ["http://localhost:5173"])
 class BffAuthController {
 
-    // Herramienta de Spring para hacer peticiones HTTP a otros servicios
     private val restTemplate = RestTemplate()
+    private val objectMapper = ObjectMapper()
 
-    // Rescata la URL del auth-service que definimos en el application.properties
     @Value("\${services.auth.url}")
     lateinit var authServiceUrl: String
 
     @PostMapping("/login")
-    fun login(@RequestBody credentials: Any): ResponseEntity<Any> {
+    fun login(@RequestBody credentials: Map<String, String>): ResponseEntity<Any> {
         val targetUrl = "$authServiceUrl/api/auth/login"
-        
-        // El BFF actúa de puente: recibe las credenciales del front, se las envía al auth-service, 
-        // y devuelve la respuesta del auth-service al frontend.
-        return restTemplate.postForEntity(targetUrl, credentials, Any::class.java)
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val request = HttpEntity(credentials, headers)
+
+        return try {
+            val response = restTemplate.exchange(targetUrl, HttpMethod.POST, request, Any::class.java)
+            ResponseEntity.status(response.statusCode).body(response.body)
+        } catch (ex: HttpStatusCodeException) {
+            val errorBody = try {
+                objectMapper.readValue(ex.responseBodyAsString, Any::class.java)
+            } catch (_: Exception) {
+                mapOf("message" to ex.statusText)
+            }
+            ResponseEntity.status(ex.statusCode).body(errorBody)
+        }
+    }
+
+    @PostMapping("/update-username")
+    fun updateUsername(@RequestBody request: Map<String, String>): ResponseEntity<Any> {
+        val targetUrl = "$authServiceUrl/api/auth/update-username"
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val httpRequest = HttpEntity(request, headers)
+
+        return try {
+            val response = restTemplate.exchange(targetUrl, HttpMethod.POST, httpRequest, Any::class.java)
+            ResponseEntity.status(response.statusCode).body(response.body)
+        } catch (ex: HttpStatusCodeException) {
+            val errorBody = try {
+                objectMapper.readValue(ex.responseBodyAsString, Any::class.java)
+            } catch (_: Exception) {
+                mapOf("message" to ex.statusText)
+            }
+            ResponseEntity.status(ex.statusCode).body(errorBody)
+        }
     }
 }
