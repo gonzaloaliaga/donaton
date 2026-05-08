@@ -1,9 +1,31 @@
 services:
+  frontend-service:
+    build: ./frontend-service
+    container_name: frontend-service
+    ports:
+      - "5173:80"
+    networks:
+      - donaton-network
+    depends_on:
+      - bff-service
+  bff-service:
+    build: ./bff-service
+    container_name: bff-service
+    ports:
+      - "8080:8080"
+    networks:
+      - donaton-network
+    depends_on:
+      - auth-service
+      - users-service
+      - donations-service
+      - inventory-service
+      - logistic-service
   auth-service:
     build: ./auth-service
     container_name: auth-service
-    ports:
-      - "8080:8080"
+    networks:
+      - donaton-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:donaton_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
@@ -14,8 +36,8 @@ services:
   users-service:
     build: ./users-service
     container_name: users-service
-    ports:
-      - "8081:8080"
+    networks:
+      - donaton-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:users_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
@@ -25,8 +47,8 @@ services:
   donations-service:
     build: ./donations-service
     container_name: donations-service
-    ports:
-      - "8082:8080"
+    networks:
+      - donaton-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:donations_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
@@ -36,8 +58,8 @@ services:
   inventory-service:
     build: ./inventory-service
     container_name: inventory-service
-    ports:
-      - "8083:8080"
+    networks:
+      - donaton-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:inventory_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
@@ -47,25 +69,17 @@ services:
   logistic-service:
     build: ./logistic-service
     container_name: logistic-service
-    ports:
-      - "8084:8080"
+    networks:
+      - donaton-network
     environment:
       - SPRING_DATASOURCE_URL=jdbc:h2:mem:logistic_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=
 
-  frontend-service:
-    build: ./frontend-service
-    container_name: frontend-service
-    ports:
-      - "80:80"
-    depends_on:
-      - auth-service
-      - users-service
-      - donations-service
-      - inventory-service
-      - logistic-service
+networks:
+  donaton-network:
+    driver: bridge
 
   # Futura base de datos (Comentar/Descomentar según se necesite)
   # db:
