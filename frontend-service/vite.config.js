@@ -1,14 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/postcss' // <--- AQUÍ ESTÁ EL CAMBIO
+import autoprefixer from 'autoprefixer'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss(),
+        autoprefixer(),
+      ],
+    },
+  },
 })
-
-// COMUNICACIÓN LOCAL CON SERVICIO AUTH
-server: {
-  proxy: {
-    '/api'; 'http://localhost:8080'
-  }
-}

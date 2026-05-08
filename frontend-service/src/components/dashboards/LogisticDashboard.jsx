@@ -1,6 +1,8 @@
-export const LogisticDashboard = () => (
-    <div style={{ border: '2px solid orange', padding: '10px' }}>
-        <h3>📦 Gestión de Suministros</h3>
-        <p>Control de inventario y logística de distribución.</p>
-    </div>
-);
+const LogisticDashboard = () => {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-100">
+            <h1 className="text-3xl font-bold text-slate-800">Panel de Logística (En construcción)</h1>
+        </div>
+    );
+};
+export default LogisticDashboard;
