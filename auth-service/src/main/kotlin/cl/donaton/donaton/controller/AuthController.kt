@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.CrossOrigin
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = ["http://localhost:8080", "http://localhost:5173"])
 class AuthController(private val userRepository: UserRepository) {
 
     // Elegimos la estrategia (Podría inyectarse por configuración)
