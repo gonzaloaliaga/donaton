@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.CrossOrigin
 @RequestMapping("/api/auth")
 class AuthController(private val userRepository: UserRepository) {
 
-    // Elegimos la estrategia (Podría inyectarse por configuración)
-    private val authStrategy: AuthenticationStrategy = RoleBasedAuthenticationStrategy()
+    // Estrategia configurable: por defecto simple, pero puede ser extendida
+    private val authStrategy: AuthenticationStrategy = SimplePasswordStrategy()
 
     @PostMapping("/login")
     fun login(@RequestBody loginRequest: Map<String, String>): ResponseEntity<Any> {
@@ -28,9 +28,8 @@ class AuthController(private val userRepository: UserRepository) {
 
         val user = userRepository.findByUsername(username)
 
-        // Usamos la estrategia: pasamos password y el objeto user encontrado
         return if (user != null && authStrategy.authenticate(password, user)) {
-            // ÉXITO: La Factory construye el objeto con el DashboardType correcto
+            // ÉXITO: Devolvemos datos mínimos, el cliente obtiene rol del users-service
             val response = AuthResponseFactory.createSuccessResponse(user)
             ResponseEntity.ok(response)
         } else {
