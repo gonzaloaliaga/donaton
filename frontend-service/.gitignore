@@ -1,5 +1,5 @@
 # Dependencias
-mode_modules/
+node_modules/
 
 # Producción
 dist/
