@@ -14,71 +14,71 @@ const Login = () => {
             // <-- CORRECCIÓN: Usamos authService.login y le pasamos los datos como espera tu archivo
             const data = await authService.login(username, password);
             login(data);
-        } catch (err) {
-            setError('Credenciales incorrectas. Verifica tus datos.');
+        } catch (error) {
+            const mensajeError = error.message === "Failed to fetch" 
+                ? "Error de conexión con el servidor."
+                : "Credenciales incorrectas.";
+            setError(mensajeError);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-slate-100">
+        // Fondo azul que ocupa toda la pantalla
+        <div className="min-h-screen flex items-center justify-center bg-blue-600 px-4">
+            
+            {/* El "Marco" (Tarjeta blanca) que envuelve toda la información */}
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm flex flex-col items-center">
                 
-                {/* Cabecera del Logo */}
-                <div className="text-center">
-                    <div className="mx-auto h-16 w-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-6">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
-                        </svg>
-                    </div>
-                    <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                        Donaton
-                    </h2>
-                    <p className="mt-2 text-sm text-slate-500 font-medium">
-                        Plataforma de Gestión Solidaria
-                    </p>
+                {/* Logo y Título dentro del marco */}
+                <div className="flex flex-col items-center mb-8">
+                    <img 
+                        src="/favicon.svg" 
+                        alt="Logo Donatón" 
+                        className="w-16 h-16 mb-3" 
+                    />
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                        Donatón
+                    </h1>
                 </div>
                 
-                {/* Formulario */}
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Usuario</label>
-                            <input
-                                type="text"
-                                required
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-slate-50 focus:bg-white outline-none"
-                                placeholder="Ej. admin"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-                            <input
-                                type="password"
-                                required
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-slate-50 focus:bg-white outline-none"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-                    </div>
+                {/* Formulario alineado dentro del marco */}
+                <form onSubmit={handleLogin} className="w-full space-y-4 flex flex-col items-center">
+                    
+                    {/* Input de Usuario */}
+                    <input 
+                        type="text" 
+                        placeholder="ingrese su usuario" 
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)} 
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 text-sm"
+                        required 
+                    />
+                    
+                    {/* Input de Contraseña */}
+                    <input 
+                        type="password" 
+                        placeholder="ingrese su contraseña" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)} 
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 text-sm"
+                        required 
+                    />
 
                     {/* Mensaje de Error */}
                     {error && (
-                        <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-                            <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <p className="text-red-600 text-sm font-medium">{error}</p>
-                        </div>
+                        <p className="text-xs text-red-500 font-medium py-1">
+                            {error}
+                        </p>
                     )}
 
-                    <button
-                        type="submit"
-                        className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    {/* Botón Ingresar: alineado y con efecto azul al clickear */}
+                    <button 
+                        type="submit" 
+                        className="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all duration-200 hover:bg-slate-700 active:bg-blue-600 shadow-md mt-2"
                     >
-                        Ingresar al Sistema
+                        ingresar
                     </button>
+                    
                 </form>
             </div>
         </div>

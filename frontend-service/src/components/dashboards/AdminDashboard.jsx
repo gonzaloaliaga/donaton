@@ -1,80 +1,83 @@
-import { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
-
-const AdminDashboard = () => {
-    const { logout, user } = useContext(AuthContext); 
-
+export const AdminDashboard = () => {
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Barra de Navegación Superior */}
-            <nav className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-500/20">
-                       <span className="text-white font-bold text-xl">D</span>
-                    </div>
-                    <h1 className="text-xl font-bold text-slate-800 hidden sm:block">Donaton Admin</h1>
-                </div>
-                <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-slate-600 bg-slate-100 px-4 py-2 rounded-full hidden sm:block">
-                        Hola, {user?.username || 'Administrador'}
-                    </span>
-                    <button 
-                        onClick={logout}
-                        className="text-sm font-bold text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors border border-transparent hover:border-red-100"
-                    >
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </nav>
+        <div className="space-y-6">
+            
+            {/* Encabezado del Dashboard */}
+            <div>
+                <h2 className="text-2xl font-bold text-slate-800">Panel de Administración</h2>
+                <p className="text-slate-500 text-sm mt-1">Resumen global y control del sistema de donaciones.</p>
+            </div>
 
-            {/* Contenido Principal */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-slate-800">Panel General</h2>
-                    <p className="text-slate-500 mt-1">Resumen de la actividad de los microservicios.</p>
+            {/* Fila de Tarjetas de Estadísticas (Métricas Simuladas) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Tarjeta 1 */}
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-2xl">
+                        👥
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500">Usuarios Activos</p>
+                        <p className="text-2xl font-bold text-slate-800">124</p>
+                    </div>
+                </div>
+
+                {/* Tarjeta 2 */}
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div className="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-2xl">
+                        📦
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500">Donaciones Hoy</p>
+                        <p className="text-2xl font-bold text-slate-800">38</p>
+                    </div>
+                </div>
+
+                {/* Tarjeta 3 */}
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div className="w-12 h-12 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-2xl">
+                        📍
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-slate-500">Zonas Activas</p>
+                        <p className="text-2xl font-bold text-slate-800">12</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Sección de Actividad Reciente */}
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div className="mb-4">
+                    <h3 className="font-bold text-lg text-slate-800">Actividad Reciente</h3>
+                    <div className="h-1 w-12 bg-blue-500 rounded-full mt-1"></div>
                 </div>
                 
-                {/* Tarjetas de Estadísticas (Grid) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">👥</div>
-                        <div>
-                            <p className="text-sm font-semibold text-slate-500">Usuarios Totales</p>
-                            <p className="text-3xl font-black text-slate-800 mt-1">124</p>
+                <ul className="space-y-4">
+                    {/* Item 1 */}
+                    <li className="flex items-center p-3 hover:bg-slate-50 rounded-lg transition-colors gap-3">
+                        <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-slate-700 font-medium">Nuevo donante registrado: HACE 5 MIN</span>
                         </div>
-                    </div>
+                    </li>
                     
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl">📦</div>
-                        <div>
-                            <p className="text-sm font-semibold text-slate-500">Donaciones Activas</p>
-                            <p className="text-3xl font-black text-slate-800 mt-1">38</p>
+                    {/* Item 2 */}
+                    <li className="flex items-center p-3 hover:bg-slate-50 rounded-lg transition-colors gap-3">
+                        <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-slate-700 font-medium">Inventario actualizado: HACE 12 MIN</span>
                         </div>
-                    </div>
+                    </li>
                     
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                        <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl">🚚</div>
-                        <div>
-                            <p className="text-sm font-semibold text-slate-500">Logística en curso</p>
-                            <p className="text-3xl font-black text-slate-800 mt-1">12</p>
+                    {/* Item 3 */}
+                    <li className="flex items-center p-3 hover:bg-slate-50 rounded-lg transition-colors gap-3">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0"></span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-slate-700 font-medium">Alerta de stock bajo: HACE 1 HORA</span>
                         </div>
-                    </div>
-                </div>
-
-                {/* Área de Tabla de Datos */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                        <h3 className="text-lg font-bold text-slate-800">Últimos Movimientos</h3>
-                        <button className="text-sm text-blue-600 font-semibold hover:text-blue-800">Ver todos</button>
-                    </div>
-                    <div className="p-12 text-center flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-3xl mb-4">⚙️</div>
-                        <p className="text-slate-500 font-medium">Aquí conectaremos los datos reales del BFF-Service.</p>
-                    </div>
-                </div>
-            </main>
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 };
-
-export default AdminDashboard;
