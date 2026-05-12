@@ -3,19 +3,16 @@ package cl.donaton.donaton.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
-import org.springframework.web.bind.annotation.RequestMethod //
+import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/api/profile")
-//
-@CrossOrigin(origins = ["http://localhost:5173"], allowedHeaders = ["*"], methods = [RequestMethod.GET, RequestMethod.PATCH, RequestMethod.OPTIONS])
-//
 class BffProfileController {
 
-    private val restTemplate = RestTemplate()
+    private val restTemplate = RestTemplate(JdkClientHttpRequestFactory())
     private val objectMapper = ObjectMapper()
 
     @Value("\${services.profile.url}")
@@ -53,9 +50,13 @@ class BffProfileController {
             val errorBody = try {
                 objectMapper.readValue(ex.responseBodyAsString, Any::class.java)
             } catch (_: Exception) {
-                mapOf("message" to ex.statusText)
+                mapOf("message" to "Error del Profile Service: ${ex.statusCode}")
             }
             ResponseEntity.status(ex.statusCode).body(errorBody)
+        } catch (ex: Exception) {
+            // Este catch atrapará errores como "Connection refused" si el microservicio está apagado
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(mapOf("message" to "Fallo de comunicación en BFF: ${ex.message}"))
         }
     }
 }
