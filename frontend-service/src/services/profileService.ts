@@ -29,19 +29,12 @@ const profileService = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(profileData),
             });
-
+            
             if (!response.ok) {
-                const errorResponse = await response.text();
-                let errorMessage = 'Error al actualizar el perfil del usuario';
-                try {
-                    const errorJson = JSON.parse(errorResponse || '{}');
-                    errorMessage = errorJson.message || errorMessage;
-                } catch {
-                    if (errorResponse) errorMessage = `${errorMessage}: ${errorResponse}`;
-                }
-                throw new Error(errorMessage);
+                const error = await response.json().catch(() => ({ message: 'Error al actualizar el perfil del usuario' }));
+                throw new Error(error.message || "Error al actualizar el perfil del usuario");
             }
-
+            
             return await response.json();
         } catch (error) {
             console.error("Error en patchUserProfile:", error);
