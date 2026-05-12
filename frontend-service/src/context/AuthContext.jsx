@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { createContext, useState, useEffect } from 'react';
 import profileService from '../services/profileService';
+import authService from '../services/authService';
 
 export const AuthContext = createContext();
 
@@ -45,12 +46,24 @@ export const AuthProvider = ({ children }) => {
         setProfile(updatedProfile);
     };
 
+    const updateUsername = async (newUsername) => {
+        if (!user) throw new Error('No hay usuario logueado');
+        await authService.updateUsername(user.username, newUsername);
+        const updatedUser = { ...user, username: newUsername };
+        setUser(updatedUser);
+        if (profile) {
+            setProfile({ ...profile, username: newUsername });
+        }
+        return updatedUser;
+    };
+
     return (
         <AuthContext.Provider value={{ 
             user, 
             setUser, 
             profile, 
-            setProfile: updateProfile,
+            updateProfile,
+            updateUsername,
             loading, 
             error, 
             login, 
