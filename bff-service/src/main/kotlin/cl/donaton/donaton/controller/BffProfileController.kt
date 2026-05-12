@@ -3,13 +3,16 @@ package cl.donaton.donaton.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
+import org.springframework.web.bind.annotation.RequestMethod //
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/api/profile")
-@CrossOrigin(origins = ["http://localhost:5173"])
+//
+@CrossOrigin(origins = ["http://localhost:5173"], allowedHeaders = ["*"], methods = [RequestMethod.GET, RequestMethod.PATCH, RequestMethod.OPTIONS])
+//
 class BffProfileController {
 
     private val restTemplate = RestTemplate()
@@ -26,6 +29,25 @@ class BffProfileController {
 
         return try {
             val response = restTemplate.exchange(targetUrl, HttpMethod.GET, request, Any::class.java)
+            ResponseEntity.status(response.statusCode).body(response.body)
+        } catch (ex: HttpStatusCodeException) {
+            val errorBody = try {
+                objectMapper.readValue(ex.responseBodyAsString, Any::class.java)
+            } catch (_: Exception) {
+                mapOf("message" to ex.statusText)
+            }
+            ResponseEntity.status(ex.statusCode).body(errorBody)
+        }
+    }
+
+    @PatchMapping("/{userId}")
+    fun updateUserProfile(@PathVariable userId: Long, @RequestBody updatedProfile: Map<String, String?>): ResponseEntity<Any> {
+        val targetUrl = "$profileServiceUrl/api/profile/$userId"
+        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val request = HttpEntity(updatedProfile, headers)
+
+        return try {
+            val response = restTemplate.exchange(targetUrl, HttpMethod.PATCH, request, Any::class.java)
             ResponseEntity.status(response.statusCode).body(response.body)
         } catch (ex: HttpStatusCodeException) {
             val errorBody = try {

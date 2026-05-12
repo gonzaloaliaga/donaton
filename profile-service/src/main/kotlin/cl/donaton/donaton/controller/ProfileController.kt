@@ -23,4 +23,22 @@ class ProfileController(private val profileRepository: InMemoryProfileRepository
             ResponseEntity.status(404).body(mapOf("message" to "Usuario no encontrado"))
         }
     }
+
+    @PatchMapping("/{userId}")
+    fun updateUserProfile(@PathVariable userId: Long, @RequestBody updatedProfile: Map<String, Any>): ResponseEntity<Any> {
+        val existingProfile = profileRepository.findById(userId)
+        
+        return if (existingProfile != null) {
+            val updated = existingProfile.copy(
+                role = updatedProfile["role"] as? String ?: existingProfile.role,
+                email = updatedProfile["email"] as? String ?: existingProfile.email,
+                address = updatedProfile["address"] as? String ?: existingProfile.address,
+                run = updatedProfile["run"] as? String ?: existingProfile.run
+            )
+            profileRepository.save(updated)
+            ResponseEntity.ok(updated)
+        } else {
+            ResponseEntity.status(404).body(mapOf("message" to "Usuario no encontrado"))
+        }
+    }
 }

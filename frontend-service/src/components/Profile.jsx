@@ -17,8 +17,11 @@ const ROLE_STRATEGIES = {
 };
 
 export default function Profile() {
-    const { user, profile, updateUsername, loading, error, logout } = useContext(AuthContext);
+    const { user, profile, updateProfile, updateUsername, loading, error, logout } = useContext(AuthContext);
     const [newUsername, setNewUsername] = useState('');
+    const [newEmail, setNewEmail] = useState('');
+    const [newAddress, setNewAddress] = useState('');
+    const [newRun, setNewRun] = useState('');
     const [message, setMessage] = useState('');
 
     const handleUpdateName = async () => {
@@ -35,6 +38,33 @@ export default function Profile() {
             setNewUsername('');
         } catch (error) {
             console.error("Error:", error);
+            setMessage('No se pudo actualizar el nombre.');
+        }
+    };
+
+    const handleUpdateProfile = async () => {
+        const payload = {
+            ...(newEmail.trim() && { email: newEmail }),
+            ...(newAddress.trim() && { address: newAddress }),
+            ...(newRun.trim() && { run: newRun }),
+        };
+
+        if (Object.keys(payload).length === 0) {
+            setMessage('Completa al menos un campo para actualizar.');
+            return;
+        }
+
+        setMessage('');
+
+        try {
+            await updateProfile(payload);
+            alert("¡Perfil actualizado!");
+            setNewEmail('');
+            setNewAddress('');
+            setNewRun('');
+        } catch (error) {
+            console.error("Error:", error);
+            setMessage(error.message || 'Error al actualizar el perfil');
         }
     };
 
@@ -60,7 +90,10 @@ export default function Profile() {
                 <div className="flex items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800">Bienvenido {user.username}</h1>
-                        <p className="text-slate-500 font-medium text-sm">Perfil: {profile.role}</p>
+                        <p className="text-slate-500 font-medium text-sm">Rol: {profile.role}</p>
+                        <p className="text-slate-500 font-medium text-sm">Email: {profile.email}</p>
+                        <p className="text-slate-500 font-medium text-sm">Dirección: {profile.address}</p>
+                        <p className="text-slate-500 font-medium text-sm">RUT: {profile.run}</p>
                     </div>
                 </div>
             </div>
@@ -77,6 +110,8 @@ export default function Profile() {
             {/* 3. Footer para actualizar nombre */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                 <h3 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wider">Ajustes de Perfil</h3>
+
+                {/* Nombre de usuario */}
                 <div className="flex items-center gap-4">
                     <input 
                         type="text"
@@ -95,6 +130,59 @@ export default function Profile() {
                         Actualizar Nombre
                     </button>
                 </div>
+
+                {/* Email */}
+                <div className="flex items-center gap-4 mt-4">
+                    <input
+                        type="text"
+                        value={newEmail}
+                        onChange={(e) => {
+                            setNewEmail(e.target.value);
+                            if (message) setMessage('');
+                        }}
+                        placeholder="Escribe tu nuevo correo electrónico..."
+                        className={`flex-1 px-4 py-3 bg-slate-50 border ${message ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-blue-500'} rounded-xl focus:ring-2 outline-none transition-all`}
+                    />
+                </div>
+
+                {/* Dirección */}
+                <div className="flex items-center gap-4 mt-4">
+                    <input
+                        type="text"
+                        value={newAddress}
+                        onChange={(e) => {
+                            setNewAddress(e.target.value);
+                            if (message) setMessage('');
+                        }}
+                        placeholder="Escribe tu nueva dirección..."
+                        className={`flex-1 px-4 py-3 bg-slate-50 border ${message ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-blue-500'} rounded-xl focus:ring-2 outline-none transition-all`}
+                    />
+                </div>
+
+                {/* RUT */}
+                <div className="flex items-center gap-4 mt-4">
+                    <input
+                        type="text"
+                        value={newRun}
+                        onChange={(e) => {
+                            setNewRun(e.target.value);
+                            if (message) setMessage('');
+                        }}
+                        placeholder="Escribe tu nuevo RUT..."
+                        className={`flex-1 px-4 py-3 bg-slate-50 border ${message ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-blue-500'} rounded-xl focus:ring-2 outline-none transition-all`}
+                    />
+                </div>
+
+                {/* Botón para actualizar el perfil completo */}
+                <div className="flex justify-end mt-4">
+                    <button
+                        onClick={handleUpdateProfile}
+                        className="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-md"
+                    >
+                        Actualizar Perfil
+                    </button>
+                </div>
+
                 {/* MENSAJE DE ERROR VISUAL */}
                 {message && (
                     <p className="text-red-500 text-sm mt-2 font-medium">⚠️ {message}</p>
