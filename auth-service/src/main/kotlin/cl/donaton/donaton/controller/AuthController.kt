@@ -5,7 +5,6 @@ import cl.donaton.donaton.factory.AuthResponseFactory
 import cl.donaton.donaton.model.InMemoryUserRepository
 import cl.donaton.donaton.model.UserRepository
 import cl.donaton.donaton.strategy.AuthenticationStrategy
-import cl.donaton.donaton.strategy.RoleBasedAuthenticationStrategy
 import cl.donaton.donaton.strategy.SimplePasswordStrategy
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
