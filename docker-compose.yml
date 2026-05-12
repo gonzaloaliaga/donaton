@@ -1,4 +1,5 @@
 services:
+
   frontend-service:
     build: ./frontend-service
     container_name: frontend-service
@@ -8,6 +9,7 @@ services:
       - donaton-network
     depends_on:
       - bff-service
+
   bff-service:
     build: ./bff-service
     container_name: bff-service
@@ -21,6 +23,15 @@ services:
       - donations-service
       - inventory-service
       - logistic-service
+      
+      # Variables de entorno para URLs internas de los microservicios (DOCKER COMPOSE)
+    environment:
+      - SERVICES_AUTH_URL=http://auth-service:8081
+      - SERVICES_USERS_URL=http://users-service:8082
+      - SERVICES_DONATIONS_URL=http://donations-service:8083
+      - SERVICES_INVENTORY_URL=http://inventory-service:8084
+      - SERVICES_LOGISTIC_URL=http://logistic-service:8085
+
   auth-service:
     build: ./auth-service
     container_name: auth-service
@@ -90,4 +101,3 @@ networks:
   #     POSTGRES_USER: user
   #     POSTGRES_PASSWORD: password
   #   ports:
-  #     - "5432:5432"
