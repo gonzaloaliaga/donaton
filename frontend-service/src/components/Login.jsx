@@ -16,41 +16,72 @@ export default function Login() {
             const data = await authService.login(username, password);
             login(data);
         } catch (error) {
-            setError(error.message)
-            console.error("Error conectando al backend:", error);
+            const mensajeError = error.message === "Failed to fetch" 
+                ? "Error de conexión con el servidor."
+                : "Credenciales incorrectas.";
+            setError(mensajeError);
         }
     };
 
     return (
-        <div className="login-container">
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
-                <h2>Iniciar Sesión</h2>
+        // Fondo azul que ocupa toda la pantalla
+        <div className="min-h-screen flex items-center justify-center bg-blue-600 px-4">
+            
+            {/* El "Marco" (Tarjeta blanca) que envuelve toda la información */}
+            <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm flex flex-col items-center">
                 
-                <input 
-                    type="text" 
-                    placeholder="Username" 
-                    onChange={(e) => setUsername(e.target.value)} 
-                    required 
-                />
+                {/* Logo y Título dentro del marco */}
+                <div className="flex flex-col items-center mb-8">
+                    <img 
+                        src="/favicon.svg" 
+                        alt="Logo Donatón" 
+                        className="w-16 h-16 mb-3" 
+                    />
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+                        Donatón
+                    </h1>
+                </div>
                 
-                <input 
-                    type="password" 
-                    placeholder="Password" 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                />
+                {/* Formulario alineado dentro del marco */}
+                <form onSubmit={handleLogin} className="w-full space-y-4 flex flex-col items-center">
+                    
+                    {/* Input de Usuario */}
+                    <input 
+                        type="text" 
+                        placeholder="ingrese su usuario" 
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)} 
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 text-sm"
+                        required 
+                    />
+                    
+                    {/* Input de Contraseña */}
+                    <input 
+                        type="password" 
+                        placeholder="ingrese su contraseña" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)} 
+                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-400 outline-none transition-all placeholder:text-slate-400 text-sm"
+                        required 
+                    />
 
-                {/* Renderizado condicional del error */}
-                {error && (
-                    <div style={{ color: 'white', background: '#ff4444', padding: '10px', borderRadius: '4px', fontSize: '14px' }}>
-                        ⚠️ {error}
-                    </div>
-                )}
+                    {/* Mensaje de Error */}
+                    {error && (
+                        <p className="text-xs text-red-500 font-medium py-1">
+                            {error}
+                        </p>
+                    )}
 
-                <button type="submit" style={{ padding: '10px', cursor: 'pointer' }}>
-                    Ingresar
-                </button>
-            </form>
+                    {/* Botón Ingresar: alineado y con efecto azul al clickear */}
+                    <button 
+                        type="submit" 
+                        className="w-full bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all duration-200 hover:bg-slate-700 active:bg-blue-600 shadow-md mt-2"
+                    >
+                        ingresar
+                    </button>
+                    
+                </form>
+            </div>
         </div>
     );
 }
