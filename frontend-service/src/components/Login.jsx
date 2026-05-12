@@ -1,25 +1,14 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import authService from '../services/authService'; // <-- CORRECCIÓN: Importamos el servicio por defecto
 
-const Login = () => {
+export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const { login } = useContext(AuthContext);
+    const { login, error, loading } = useContext(AuthContext);
 
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        try {
-            // <-- CORRECCIÓN: Usamos authService.login y le pasamos los datos como espera tu archivo
-            const data = await authService.login(username, password);
-            login(data);
-        } catch (error) {
-            const mensajeError = error.message === "Failed to fetch" 
-                ? "Error de conexión con el servidor."
-                : "Credenciales incorrectas.";
-            setError(mensajeError);
-        }
+        await login(username, password);
     };
 
     return (
@@ -83,6 +72,4 @@ const Login = () => {
             </div>
         </div>
     );
-};
-
-export default Login;
+}

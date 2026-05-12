@@ -32,8 +32,22 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = (userData) => {
-        setUser(userData);
+    const login = async (username, password) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const userData = await authService.login(username, password);
+            setUser(userData);
+            return userData;
+        } catch (err) {
+            const mensajeError = err.message === "Failed to fetch"
+                ? "Error de conexión con el servidor."
+                : "Credenciales incorrectas.";
+            setError(mensajeError);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
     };
 
     const logout = () => {

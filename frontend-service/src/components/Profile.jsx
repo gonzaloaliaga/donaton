@@ -1,6 +1,5 @@
-import React, { useState, useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import authService from "../services/authService";
 import MainLayout from './MainLayout';
 
 // DASHBOARDS
@@ -18,29 +17,29 @@ const ROLE_STRATEGIES = {
 };
 
 export default function Profile() {
-    const { user, setUser } = useContext(AuthContext);
-    const [newName, setNewName] = useState('');
-    const [nameError, setNameError] = useState('');
+    const { user, profile, updateUsername, loading, error, logout } = useContext(AuthContext);
+    const [newUsername, setNewUsername] = useState('');
+    const [message, setMessage] = useState('');
 
     const handleUpdateName = async () => {
-        if (!newName.trim()) {
-            setNameError('El nombre no puede estar vacío.');
+        if (!newUsername.trim()) {
+            setMessage('El nombre no puede estar vacío.');
             return;
         }
 
-        setNameError('');
+        setMessage('');
 
         try {
-            await authService.updateUsername(user.username, newName);
-            setUser({ ...user, username: newName });
+            await updateUsername(newUsername);
             alert("¡Nombre actualizado!");
-            setNewName('');
+            setNewUsername('');
         } catch (error) {
             console.error("Error:", error);
         }
     };
 
     if (!user) return null;
+    if (!profile) return null;
 
     if (loading) return (
         <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
@@ -61,16 +60,16 @@ export default function Profile() {
                 <div className="flex items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800">Bienvenido {user.username}</h1>
-                        <p className="text-slate-500 font-medium text-sm">Perfil: {user.role}</p>
+                        <p className="text-slate-500 font-medium text-sm">Perfil: {profile.role}</p>
                     </div>
                 </div>
             </div>
 
             {/* 2. Dashboard según mapeo (Tu misma lógica) */}
             <div className="mb-6">
-                {ROLE_STRATEGIES[user.role] || (
+                {ROLE_STRATEGIES[profile.role] || (
                     <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200">
-                        Rol no reconocido: {user.role}
+                        Rol no reconocido: {profile.role}
                     </div>
                 )}
             </div>
@@ -81,13 +80,13 @@ export default function Profile() {
                 <div className="flex items-center gap-4">
                     <input 
                         type="text"
-                        value={newName} 
+                        value={newUsername} 
                         onChange={(e) => {
-                            setNewName(e.target.value);
-                            if (nameError) setNameError('');
+                            setNewUsername(e.target.value);
+                            if (message) setMessage('');
                         }} 
                         placeholder="Escribe tu nuevo nombre de usuario..." 
-                        className={`flex-1 px-4 py-3 bg-slate-50 border ${nameError ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-blue-500'} rounded-xl focus:ring-2 outline-none transition-all`}
+                        className={`flex-1 px-4 py-3 bg-slate-50 border ${message ? 'border-red-500 focus:ring-red-500' : 'border-slate-300 focus:ring-blue-500'} rounded-xl focus:ring-2 outline-none transition-all`}
                     />
                     <button 
                         onClick={handleUpdateName}
@@ -97,13 +96,11 @@ export default function Profile() {
                     </button>
                 </div>
                 {/* MENSAJE DE ERROR VISUAL */}
-                {nameError && (
-                    <p className="text-red-500 text-sm mt-2 font-medium">⚠️ {nameError}</p>
+                {message && (
+                    <p className="text-red-500 text-sm mt-2 font-medium">⚠️ {message}</p>
                 )}
             </div>
 
         </MainLayout>
     );
-};
-
-export default Profile;
+}
