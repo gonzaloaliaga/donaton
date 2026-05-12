@@ -20,7 +20,7 @@ class BffProfileController {
 
     @GetMapping("/{userId}")
     fun getUserProfile(@PathVariable userId: Long): ResponseEntity<Any> {
-        val targetUrl = "$profileServiceUrl/api/users/$userId"
+        val targetUrl = "$profileServiceUrl/api/profile/$userId"
         val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
         val request = HttpEntity("", headers)
 
