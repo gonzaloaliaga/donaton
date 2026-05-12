@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 export default function Sidebar() {
-    const { user, logout } = useContext(AuthContext);
+    const { profile, logout } = useContext(AuthContext);
 
     const menuOptions = {
         ADMIN: [
@@ -24,7 +24,7 @@ export default function Sidebar() {
         ]
     };
 
-    const options = menuOptions[user?.role] || [];
+    const options = menuOptions[profile?.role] || [];
 
     return (
         <div className="w-64 min-h-screen bg-slate-900 text-white flex flex-col">

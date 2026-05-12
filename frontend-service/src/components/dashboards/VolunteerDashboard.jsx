@@ -1,8 +1,6 @@
-const VolunteerDashboard = () => {
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-100">
-            <h1 className="text-3xl font-bold text-slate-800">Panel de Voluntario (En construcción)</h1>
-        </div>
-    );
-};
-export default VolunteerDashboard;
+export const VolunteerDashboard = () => (
+    <div style={{ border: '2px solid green', padding: '10px' }}>
+        <h3>💪 Gestión de Tareas en Terreno</h3>
+        <p>Tareas en terreno y centros de acopio.</p>
+    </div>
+);
