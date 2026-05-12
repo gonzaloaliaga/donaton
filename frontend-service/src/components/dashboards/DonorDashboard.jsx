@@ -1,6 +1,8 @@
-export const DonorDashboard = () => (
-    <div style={{ border: '2px solid blue', padding: '10px' }}>
-        <h3>⚡ Donación de Insumos</h3>
-        <p>Realiza una donación de insumos alimenticios, vestimenta o monetario.</p>
-    </div>
-);
+const DonorDashboard = () => {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-100">
+            <h1 className="text-3xl font-bold text-slate-800">Panel de Donante (En construcción)</h1>
+        </div>
+    );
+};
+export default DonorDashboard;

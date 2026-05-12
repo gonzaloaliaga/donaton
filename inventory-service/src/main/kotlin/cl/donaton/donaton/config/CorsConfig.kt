@@ -15,7 +15,7 @@ class CorsConfig {
                 registry.addMapping("/**") // Aplica a todos los endpoints
                     .allowedOrigins(
                         "http://localhost:8080", 
-                        "http://127.0.0.1"
+                        "http://localhost:5173"
                     )
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")

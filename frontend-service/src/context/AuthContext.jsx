@@ -1,16 +1,75 @@
 /* eslint-disable react/prop-types */
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
+import profileService from '../services/profileService';
+import authService from '../services/authService';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // Almacena el nombre del usuario logueado
+    const [user, setUser] = useState(null); // Almacena datos del usuario logueado
+    const [profile, setProfile] = useState(null); // Almacena datos del perfil del usuario
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const login = (userData) => setUser(userData);
-    const logout = () => setUser(null);
+    // Obtener perfil cuando el usuario se loguea
+    useEffect(() => {
+        if (user && user.id) {
+            fetchUserProfile(user.id);
+        }
+    }, [user?.id]);
+
+    const fetchUserProfile = async (userId) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const profileData = await profileService.getUserProfile(userId);
+            setProfile(profileData);
+        } catch (err) {
+            setError(err.message || "Error al cargar el perfil");
+            console.error("Error al obtener perfil:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const login = (userData) => {
+        setUser(userData);
+    };
+
+    const logout = () => {
+        setUser(null);
+        setProfile(null);
+        setError(null);
+    };
+
+    const updateProfile = (updatedProfile) => {
+        setProfile(updatedProfile);
+    };
+
+    const updateUsername = async (newUsername) => {
+        if (!user) throw new Error('No hay usuario logueado');
+        await authService.updateUsername(user.username, newUsername);
+        const updatedUser = { ...user, username: newUsername };
+        setUser(updatedUser);
+        if (profile) {
+            setProfile({ ...profile, username: newUsername });
+        }
+        return updatedUser;
+    };
 
     return (
-        <AuthContext.Provider value={{ user, setUser, login, logout }}>
+        <AuthContext.Provider value={{ 
+            user, 
+            setUser, 
+            profile, 
+            updateProfile,
+            updateUsername,
+            loading, 
+            error, 
+            login, 
+            logout,
+            fetchUserProfile 
+        }}>
             {children}
         </AuthContext.Provider>
     );

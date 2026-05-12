@@ -2,29 +2,31 @@ package cl.donaton.donaton.strategy
 
 import cl.donaton.donaton.model.User
 
+/**
+ * Estrategia de autenticación.
+ * El auth-service SOLO valida credenciales (username + password).
+ * La lógica de roles y asignación de dashboards se maneja en el servicio de usuarios.
+ */
 interface AuthenticationStrategy {
-    // Recibe el objeto User completo para validar según sus atributos
     fun authenticate(inputPass: String, user: User): Boolean
 }
 
-class RoleBasedAuthenticationStrategy : AuthenticationStrategy {
-    override fun authenticate(inputPass: String, user: User): Boolean {
-        val isPasswordCorrect = inputPass == user.password
-        
-        // Lógica de estrategia según rol:
-        return when (user.role) {
-            "ADMIN" -> isPasswordCorrect && inputPass.length >= 4 // Los admin deben tener claves de min 4
-            "LOGISTIC" -> isPasswordCorrect // Logística validación estándar
-            "VOLUNTEER" -> isPasswordCorrect // Voluntarios validación estándar
-            "DONOR" -> isPasswordCorrect // Donantes validación estándar
-            else -> false
-        }
-    }
-}
-
-// Se mantiene para volver a usarla en pruebas
+/**
+ * Estrategia simple: validación básica de contraseña
+ */
 class SimplePasswordStrategy : AuthenticationStrategy {
     override fun authenticate(inputPass: String, user: User): Boolean {
         return inputPass == user.password
+    }
+}
+
+/**
+ * Estrategia con validaciones adicionales de seguridad (ej: longitud mínima)
+ */
+class EnhancedSecurityStrategy : AuthenticationStrategy {
+    override fun authenticate(inputPass: String, user: User): Boolean {
+        val isPasswordCorrect = inputPass == user.password
+        val hasMinimumLength = inputPass.length >= 4
+        return isPasswordCorrect && hasMinimumLength
     }
 }

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import authService from "../services/authService";
 import MainLayout from './MainLayout';
@@ -41,6 +41,18 @@ export default function Profile() {
     };
 
     if (!user) return null;
+
+    if (loading) return (
+        <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
+            <p className="text-lg text-slate-600">Cargando perfil...</p>
+        </div>
+    );
+
+    if (error) return (
+        <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
+            <p className="text-lg text-red-600">Error al cargar perfil: {error}</p>
+        </div>
+    );
 
     return (
         <MainLayout>
@@ -92,4 +104,6 @@ export default function Profile() {
 
         </MainLayout>
     );
-}
+};
+
+export default Profile;

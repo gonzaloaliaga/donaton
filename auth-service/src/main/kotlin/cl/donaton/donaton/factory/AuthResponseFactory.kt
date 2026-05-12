@@ -2,20 +2,26 @@ package cl.donaton.donaton.factory
 
 import cl.donaton.donaton.model.User
 
+/**
+ * Response mínimo de autenticación.
+ * El auth-service solo confirma que las credenciales son válidas.
+ * Los datos adicionales (rol, dashboardType) se obtienen del servicio de usuarios.
+ */
 data class AuthResponse(
+    val id: Long,
     val username: String,
-    val role: String,
-    val dashboardType: String, // "ADMIN_PANEL", "LOGISTIC_PANEL", "VOLUNTEER_PANEL", "DONOR_PANEL"
+    val token: String? = null  // Opcional: JWT o token de sesión
 )
 
 object AuthResponseFactory {
+    /**
+     * Crea una respuesta de autenticación exitosa.
+     * Nota: Los datos de rol y dashboard se obtienen desde el servicio de usuarios.
+     */
     fun createSuccessResponse(user: User): AuthResponse {
-        val dashboard = when(user.role) {
-            "ADMIN" -> "ADMIN_PANEL"
-            "LOGISTIC" -> "LOGISTIC_PANEL"
-            "VOLUNTEER" -> "VOLUNTEER_PANEL"
-            else -> "DONOR_PANEL"
-        }
-        return AuthResponse(user.username, user.role, dashboard)
+        return AuthResponse(
+            id = user.id,
+            username = user.username
+        )
     }
 }

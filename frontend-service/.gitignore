@@ -7,7 +7,7 @@ dist-ssr/
 
 # Variables de entorno locales
 .env
-.env-local
+.env.local
 
 # Logs
 npm-debug.log*

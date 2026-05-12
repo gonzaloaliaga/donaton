@@ -1,18 +1,17 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import authService from '../services/authService';
+import authService from '../services/authService'; // <-- CORRECCIÓN: Importamos el servicio por defecto
 
-export default function Login() {
+const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
     const { login } = useContext(AuthContext);
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
-
         try {
+            // <-- CORRECCIÓN: Usamos authService.login y le pasamos los datos como espera tu archivo
             const data = await authService.login(username, password);
             login(data);
         } catch (error) {
@@ -84,4 +83,6 @@ export default function Login() {
             </div>
         </div>
     );
-}
+};
+
+export default Login;
