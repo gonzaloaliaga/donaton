@@ -56,9 +56,12 @@ export const AuthProvider = ({ children }) => {
         setError(null);
     };
 
-    const updateProfile = (updatedProfile) => {
+    const updateProfile = async (updatedData) => {
+        if (!user) throw new Error('No hay usuario logueado');
+        const updatedProfile = await profileService.patchUserProfile(user.id, updatedData);
         setProfile(updatedProfile);
-    };
+        return updatedProfile;
+    }
 
     const updateUsername = async (newUsername) => {
         if (!user) throw new Error('No hay usuario logueado');

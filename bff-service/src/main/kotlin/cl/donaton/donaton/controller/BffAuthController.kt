@@ -9,7 +9,6 @@ import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = ["http://localhost:5173"])
 class BffAuthController {
 
     private val restTemplate = RestTemplate()

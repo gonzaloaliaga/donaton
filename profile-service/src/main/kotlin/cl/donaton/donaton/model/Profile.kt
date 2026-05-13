@@ -14,6 +14,7 @@ data class Profile(
 // Patron Repository: Interfaz clara de acceso a datos
 interface ProfileRepository {
     fun findById(id: Long): Profile?
+    fun save(profile: Profile): Profile
 }
 
 // Implementación (Simulada para desarrollo)
@@ -26,4 +27,14 @@ class InMemoryProfileRepository : ProfileRepository {
         Profile(4, "DONOR", "donor@gmail.cl", "Depa Ruidoso 456", "123456789"),
     )
     override fun findById(id: Long) = profiles.find { it.id == id }
+
+    override fun save(profile: Profile): Profile {
+        val index = profiles.indexOfFirst { it.id == profile.id }
+        if (index != -1) {
+            profiles[index] = profile
+        } else {
+            profiles.add(profile)
+        }
+        return profile
+    }
 }
