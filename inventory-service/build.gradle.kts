@@ -30,7 +30,14 @@ dependencies {
 	// runtimeOnly("org.postgresql:postgresql")
 
 	// DB EN MEMORIA SOLO DESARROLLO
-	runtimeOnly("com.h2database:h2")
+	//runtimeOnly("com.h2database:h2")
+
+	// Conexión a PostgreSQL
+	runtimeOnly("org.postgresql:postgresql")
+
+	// Dependencias de Flyway
+	implementation("org.springframework.boot:spring-boot-starter-flyway")
+	implementation("org.flywaydb:flyway-database-postgresql")
 
 	annotationProcessor("org.projectlombok:lombok")
 
