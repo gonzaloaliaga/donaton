@@ -23,8 +23,6 @@ services:
       - donations-service
       - inventory-service
       - logistic-service
-      
-      # Variables de entorno para URLs internas de los microservicios (DOCKER COMPOSE)
     environment:
       - SERVICES_AUTH_URL=http://auth-service:8081
       - SERVICES_PROFILE_URL=http://profile-service:8082
@@ -38,9 +36,9 @@ services:
     networks:
       - donaton-network
     depends_on:
-      - db
+      - auth-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/auth_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
@@ -51,9 +49,9 @@ services:
     networks:
       - donaton-network
     depends_on:
-      - db
+      - profile-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/profile_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://profile-db:5432/profile_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
@@ -64,9 +62,9 @@ services:
     networks:
       - donaton-network
     depends_on:
-      - db
+      - donations-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/donations_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://donations-db:5432/donations_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
@@ -77,9 +75,9 @@ services:
     networks:
       - donaton-network
     depends_on:
-      - db
+      - inventory-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/inventory_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventory-db:5432/inventory_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
@@ -90,26 +88,80 @@ services:
     networks:
       - donaton-network
     depends_on:
-      - db
+      - logistic-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/logistic_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://logistic-db:5432/logistic_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
       - SPRING_DATASOURCE_PASSWORD=password
 
-  db:
+  auth-db:
     image: postgres:16
-    container_name: donaton-db
+    container_name: auth-db
     environment:
+      - POSTGRES_DB=auth_db
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
-    ports:
-      - "5432:5432"
     networks:
       - donaton-network
     volumes:
-      - ./init-databases.sql:/docker-entrypoint-initdb.d/init.sql
+      - auth-db-data:/var/lib/postgresql/data
+
+  profile-db:
+    image: postgres:16
+    container_name: profile-db
+    environment:
+      - POSTGRES_DB=profile_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - profile-db-data:/var/lib/postgresql/data
+
+  donations-db:
+    image: postgres:16
+    container_name: donations-db
+    environment:
+      - POSTGRES_DB=donations_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - donations-db-data:/var/lib/postgresql/data
+
+  inventory-db:
+    image: postgres:16
+    container_name: inventory-db
+    environment:
+      - POSTGRES_DB=inventory_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+
+  logistic-db:
+    image: postgres:16
+    container_name: logistic-db
+    environment:
+      - POSTGRES_DB=logistic_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - logistic-db-data:/var/lib/postgresql/data
 
 networks:
   donaton-network:
     driver: bridge
+
+volumes:
+  auth-db-data:
+  profile-db-data:
+  donations-db-data:
+  inventory-db-data:
+  logistic-db-data:
