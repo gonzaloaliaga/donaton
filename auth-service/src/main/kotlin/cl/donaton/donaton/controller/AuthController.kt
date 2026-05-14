@@ -1,23 +1,16 @@
 package cl.donaton.donaton.controller
 
-import cl.donaton.donaton.factory.AuthResponse
 import cl.donaton.donaton.factory.AuthResponseFactory
-import cl.donaton.donaton.model.InMemoryUserRepository
-import cl.donaton.donaton.model.UserRepository
+import cl.donaton.donaton.repository.UserRepository
 import cl.donaton.donaton.strategy.AuthenticationStrategy
 import cl.donaton.donaton.strategy.SimplePasswordStrategy
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.bind.annotation.CrossOrigin
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(private val userRepository: UserRepository) {
 
-    // Estrategia configurable: por defecto simple, pero puede ser extendida
     private val authStrategy: AuthenticationStrategy = SimplePasswordStrategy()
 
     @PostMapping("/login")
@@ -28,11 +21,9 @@ class AuthController(private val userRepository: UserRepository) {
         val user = userRepository.findByUsername(username)
 
         return if (user != null && authStrategy.authenticate(password, user)) {
-            // ÉXITO: Devolvemos datos mínimos, el cliente obtiene rol del users-service
             val response = AuthResponseFactory.createSuccessResponse(user)
             ResponseEntity.ok(response)
         } else {
-            // ERROR:
             ResponseEntity.status(401).body(mapOf("message" to "Credenciales incorrectas"))
         }
     }
@@ -42,10 +33,11 @@ class AuthController(private val userRepository: UserRepository) {
         val currentUsername = request["currentUsername"] ?: ""
         val newUsername = request["newUsername"] ?: ""
 
-        // Cast manual para acceder al metodo del repositorio de memoria
-        val updatedUser = (userRepository as InMemoryUserRepository).update(currentUsername, newUsername)
+        val user = userRepository.findByUsername(currentUsername)
 
-        return if (updatedUser != null) {
+        return if (user != null) {
+            user.username = newUsername
+            userRepository.save(user)
             ResponseEntity.ok(mapOf("message" to "Nombre actualizado", "username" to newUsername))
         } else {
             ResponseEntity.status(404).body(mapOf("message" to "Usuario no encontrado"))
