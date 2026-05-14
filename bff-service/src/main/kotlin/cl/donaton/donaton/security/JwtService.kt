@@ -1,10 +1,11 @@
 package cl.donaton.donaton.security
 
-import io.jsonwebtoken.Jwts
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.security.KeyFactory
-import java.security.PublicKey
+import java.security.interfaces.RSAPublicKey
 import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 
@@ -12,26 +13,36 @@ import java.util.Base64
 class JwtService(
     @Value("\${JWT_PUBLIC_KEY}") private val publicKeyBase64: String
 ) {
-    // Reconstrucción de la llave
-    private val publicKey: PublicKey by lazy {
-        val cleanKey = publicKeyBase64.replace("\\s".toRegex(), "")
-        val keyBytes = Base64.getDecoder().decode(cleanKey)
-        val spec = new X509EncodedKeySpec(keyBytes)
+    private val algorithm: Algorithm by lazy {
+        Algorithm.RSA256(getPublicKey(), null)
+    }
+
+    private val verifier by lazy {
+        JWT.require(algorithm).build()
+    }
+
+    private fun unpackKey(envBase64: String): String {
+        val pemString = String(Base64.getDecoder().decode(envBase64))
+        return pemString
+            .replace("-----BEGIN PUBLIC KEY-----", "")
+            .replace("-----END PUBLIC KEY-----", "")
+            .replace("\\s".toRegex(), "")
+    }
+
+    private fun getPublicKey(): RSAPublicKey {
+        val pureBase64 = unpackKey(publicKeyBase64)
+        val keyBytes = Base64.getDecoder().decode(pureBase64)
+        val spec = X509EncodedKeySpec(keyBytes)
         val kf = KeyFactory.getInstance("RSA")
-        kf.generatePublic(spec)
+        return kf.generatePublic(spec) as RSAPublicKey
     }
 
     fun validateAndExtractId(token: String): String? {
         return try {
-            // SINTAXIS PARA JJWT 0.11.5
-            val claims = Jwts.parserBuilder()
-                .setSigningKey(publicKey)
-                .build()
-                .parseClaimsJws(token)
-                .body
-
-            claims.subject
+            val decodedJWT = verifier.verify(token)
+            decodedJWT.subject
         } catch (e: Exception) {
+            println("Error validando token: ${e.message}")
             null
         }
     }
