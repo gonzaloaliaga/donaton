@@ -24,7 +24,7 @@ services:
       - inventory-service
       - logistic-service
     environment:
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
       - SERVICES_AUTH_URL=http://auth-service:8081
       - SERVICES_PROFILE_URL=http://profile-service:8082
       - SERVICES_DONATIONS_URL=http://donations-service:8083
@@ -39,7 +39,8 @@ services:
     depends_on:
       - auth-db
     environment:
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
       - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth_db
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_USERNAME=user
