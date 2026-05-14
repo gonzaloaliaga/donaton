@@ -1,32 +1,170 @@
 services:
+
+  frontend-service:
+    build: ./frontend-service
+    container_name: frontend-service
+    ports:
+      - "5173:80"
+    networks:
+      - donaton-network
+    depends_on:
+      - bff-service
+
+  bff-service:
+    build: ./bff-service
+    container_name: bff-service
+    ports:
+      - "8080:8080"
+    networks:
+      - donaton-network
+    depends_on:
+      - auth-service
+      - profile-service
+      - donations-service
+      - inventory-service
+      - logistic-service
+    environment:
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - SERVICES_AUTH_URL=http://auth-service:8081
+      - SERVICES_PROFILE_URL=http://profile-service:8082
+      - SERVICES_DONATIONS_URL=http://donations-service:8083
+      - SERVICES_INVENTORY_URL=http://inventory-service:8084
+      - SERVICES_LOGISTIC_URL=http://logistic-service:8085
+
   auth-service:
     build: ./auth-service
     container_name: auth-service
-    ports:
-      - "8080:8080"
-    environment:
-      # Configuración para H2 en memoria
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:donaton_db
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=
-      - SPRING_H2_CONSOLE_ENABLED=true
-
-  frontend:
-    build: ./frontend
-    container_name: donaton-frontend
-    ports:
-      - "80:80"
+    networks:
+      - donaton-network
     depends_on:
-      - auth-service
+      - auth-db
+    environment:
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://auth-db:5432/auth_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
 
-  # Futura base de datos (Comentar/Descomentar según se necesite)
-  # db:
-  #   image: postgres:18
-  #   container_name: donaton-db
-  #   environment:
-  #     POSTGRES_DB: donaton_db
-  #     POSTGRES_USER: user
-  #     POSTGRES_PASSWORD: password
-  #   ports:
-  #     - "5432:5432"
+  profile-service:
+    build: ./profile-service
+    container_name: profile-service
+    networks:
+      - donaton-network
+    depends_on:
+      - profile-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://profile-db:5432/profile_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+
+  donations-service:
+    build: ./donations-service
+    container_name: donations-service
+    networks:
+      - donaton-network
+    depends_on:
+      - donations-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://donations-db:5432/donations_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    networks:
+      - donaton-network
+    depends_on:
+      - inventory-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://inventory-db:5432/inventory_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+
+  logistic-service:
+    build: ./logistic-service
+    container_name: logistic-service
+    networks:
+      - donaton-network
+    depends_on:
+      - logistic-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://logistic-db:5432/logistic_db
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+
+  auth-db:
+    image: postgres:16
+    container_name: auth-db
+    environment:
+      - POSTGRES_DB=auth_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+
+  profile-db:
+    image: postgres:16
+    container_name: profile-db
+    environment:
+      - POSTGRES_DB=profile_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - profile-db-data:/var/lib/postgresql/data
+
+  donations-db:
+    image: postgres:16
+    container_name: donations-db
+    environment:
+      - POSTGRES_DB=donations_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - donations-db-data:/var/lib/postgresql/data
+
+  inventory-db:
+    image: postgres:16
+    container_name: inventory-db
+    environment:
+      - POSTGRES_DB=inventory_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - inventory-db-data:/var/lib/postgresql/data
+
+  logistic-db:
+    image: postgres:16
+    container_name: logistic-db
+    environment:
+      - POSTGRES_DB=logistic_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - donaton-network
+    volumes:
+      - logistic-db-data:/var/lib/postgresql/data
+
+networks:
+  donaton-network:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  profile-db-data:
+  donations-db-data:
+  inventory-db-data:
+  logistic-db-data:
