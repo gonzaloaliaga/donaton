@@ -15,13 +15,14 @@ data class AuthResponse(
 
 object AuthResponseFactory {
     /**
-     * Crea una respuesta de autenticación exitosa.
-     * Nota: Los datos de rol y dashboard se obtienen desde el servicio de usuarios.
+     * Centraliza la creación de la respuesta de éxito, 
+     * integrando el token generado por el servicio de JWT.
      */
-    fun createSuccessResponse(user: User): AuthResponse {
+    fun createSuccessResponse(user: User, token: String): AuthResponse {
         return AuthResponse(
             id = user.id,
-            username = user.username
+            username = user.username,
+            token = token
         )
     }
-}
+}z
