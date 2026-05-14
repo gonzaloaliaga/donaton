@@ -32,7 +32,7 @@ class ProfileController(private val profileRepository: ProfileRepository) {
                 address = updatedProfile["address"] as? String ?: existingProfile.address,
                 run = updatedProfile["run"] as? String ?: existingProfile.run
             )
-            // Este .save() ahora ejecutará un UPDATE en PostgreSQL
+
             profileRepository.save(updated)
             ResponseEntity.ok(updated)
         } else {
