@@ -3,6 +3,7 @@ package cl.donaton.donaton.security
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
+import org.springframework.beans.factory.annotation.Value
 import java.util.*
 
 @Service

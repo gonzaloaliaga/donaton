@@ -1,8 +1,9 @@
-package cl.donaton.donaton.service
+package cl.donaton.donaton.security
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
+import org.springframework.beans.factory.annotation.Value
 import java.util.*
 
 @Service
@@ -21,16 +22,17 @@ class JwtService(
             .compact()
     }
 
-    fun extractUserId(token: String): String? {
-    return try {
-        Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .payload
-            .subject
-    } catch (e: Exception) {
-        null
+    fun extractUserId(token: String): Long? {
+        return try {
+            val claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .payload
+            
+            claims.subject.toLong()
+        } catch (e: Exception) {
+            null
+        }
     }
-}
 }

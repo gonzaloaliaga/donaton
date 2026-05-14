@@ -25,4 +25,4 @@ object AuthResponseFactory {
             token = token
         )
     }
-}z
+}

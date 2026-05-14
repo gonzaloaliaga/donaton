@@ -2,13 +2,9 @@ package cl.donaton.donaton.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-
-package cl.donaton.donaton.security
-
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
@@ -21,29 +17,30 @@ class JwtValidationFilter(private val jwtService: JwtService) : OncePerRequestFi
     ) {
         val path = request.servletPath
 
-        // 1. Permitir el paso libre al login del Auth Service
-        if (path.contains("/api/auth/login")) {
+        // Omitir validación para el login y preflights CORS
+        if (path.contains("/api/auth/login") || request.method.equals("OPTIONS", ignoreCase = true)) {
             filterChain.doFilter(request, response)
             return
         }
 
-        // 2. Extraer el header Authorization
         val authHeader = request.getHeader("Authorization")
+        
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token faltante o formato inválido")
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Acceso denegado: Token inexistente")
             return
         }
 
-        // 3. Validar el token
         val token = authHeader.substring(7)
-        val isValid = jwtService.validateToken(token)
+        val userId = jwtService.validateAndExtractId(token)
 
-        if (!isValid) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido o expirado")
+        if (userId == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Acceso denegado: Token inválido")
             return
         }
 
-        // Si todo está bien, continuar hacia el Controller del BFF
+        // IMPORTANTE: Guarda el ID en el request para que el controlador lo tenga a mano
+        request.setAttribute("authenticatedUserId", userId)
+
         filterChain.doFilter(request, response)
     }
 }

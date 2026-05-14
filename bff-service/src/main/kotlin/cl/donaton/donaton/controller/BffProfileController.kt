@@ -3,25 +3,33 @@ package cl.donaton.donaton.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.*
-import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.client.HttpStatusCodeException
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.apache.hc.client5.http.impl.classic.HttpClients
 import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("/api/profile")
-class BffProfileController {
+class BffProfileController(
+    @Value("\${services.profile.url}") private val profileServiceUrl: String
+) {
 
-    private val restTemplate = RestTemplate(JdkClientHttpRequestFactory())
+    private val restTemplate = RestTemplate(HttpComponentsClientHttpRequestFactory(HttpClients.createDefault()))
     private val objectMapper = ObjectMapper()
 
-    @Value("\${services.profile.url}")
-    lateinit var profileServiceUrl: String
-
     @GetMapping("/{userId}")
-    fun getUserProfile(@PathVariable userId: Long): ResponseEntity<Any> {
+    fun getUserProfile(
+        @PathVariable userId: Long,
+        @RequestHeader("Authorization", required = false) authHeader: String?
+    ): ResponseEntity<Any> {
         val targetUrl = "$profileServiceUrl/api/profile/$userId"
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            if (!authHeader.isNullOrBlank()) {
+                set("Authorization", authHeader)
+            }
+        }
         val request = HttpEntity("", headers)
 
         return try {
@@ -38,9 +46,18 @@ class BffProfileController {
     }
 
     @PatchMapping("/{userId}")
-    fun updateUserProfile(@PathVariable userId: Long, @RequestBody updatedProfile: Map<String, String?>): ResponseEntity<Any> {
+    fun updateUserProfile(
+        @PathVariable userId: Long,
+        @RequestHeader("Authorization", required = false) authHeader: String?,
+        @RequestBody updatedProfile: Map<String, String?>
+    ): ResponseEntity<Any> {
         val targetUrl = "$profileServiceUrl/api/profile/$userId"
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            if (!authHeader.isNullOrBlank()) {
+                set("Authorization", authHeader)
+            }
+        }
         val request = HttpEntity(updatedProfile, headers)
 
         return try {

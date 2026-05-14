@@ -37,9 +37,17 @@ class BffAuthController {
     }
 
     @PostMapping("/update-username")
-    fun updateUsername(@RequestBody request: Map<String, String>): ResponseEntity<Any> {
+    fun updateUsername(
+        @RequestHeader("Authorization", required = false) authHeader: String?,
+        @RequestBody request: Map<String, String>
+    ): ResponseEntity<Any> {
         val targetUrl = "$authServiceUrl/api/auth/update-username"
-        val headers = HttpHeaders().apply { contentType = MediaType.APPLICATION_JSON }
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.APPLICATION_JSON
+            if (!authHeader.isNullOrBlank()) {
+                set("Authorization", authHeader)
+            }
+        }
         val httpRequest = HttpEntity(request, headers)
 
         return try {
