@@ -6,14 +6,38 @@ import authService from '../services/authService';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null); // Almacena datos del usuario logueado
-    const [profile, setProfile] = useState(null); // Almacena datos del perfil del usuario
-    const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState(null); 
+    const [profile, setProfile] = useState(null); 
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Obtener perfil cuando el usuario se loguea
+    // 1. Efecto de carga inicial: Verifica si hay una sesión previa
     useEffect(() => {
-        if (user && user.id) {
+        const initAuth = async () => {
+            const token = localStorage.getItem('donaton_token');
+            const userId = localStorage.getItem('user_id');
+            const username = localStorage.getItem('username');
+
+            if (token && userId && username) {
+                try {
+                    // Si hay token, intenta recuperar el perfil directamente
+                    // Esto valida implícitamente si el token sigue siendo útil
+                    await fetchUserProfile(userId);
+                    setUser({ id: userId, username: username }); // Restaura el estado completo del usuario
+                } catch (err) {
+                    console.error("Sesión expirada o inválida:", err);
+                    logout(); // Si el token falló, limpia todo
+                }
+            }
+            setLoading(false);
+        };
+
+        initAuth();
+    }, []);
+
+    // 2. Efecto para obtener perfil cuando el usuario cambia (ej: tras el login)
+    useEffect(() => {
+        if (user && user.id && !profile) {
             fetchUserProfile(user.id);
         }
     }, [user?.id]);
@@ -26,7 +50,7 @@ export const AuthProvider = ({ children }) => {
             setProfile(profileData);
         } catch (err) {
             setError(err.message || "Error al cargar el perfil");
-            console.error("Error al obtener perfil:", err);
+            throw err; 
         } finally {
             setLoading(false);
         }
@@ -37,7 +61,8 @@ export const AuthProvider = ({ children }) => {
         setError(null);
         try {
             const userData = await authService.login(username, password);
-            setUser(userData);
+            // El authService ya guarda el token en localStorage según lo implementamos antes
+            setUser({ id: userData.id, username: userData.username }); // Solo guardar id y username en el estado
             return userData;
         } catch (err) {
             const mensajeError = err.message === "Failed to fetch"
@@ -51,9 +76,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        // Limpia estados de React
         setUser(null);
         setProfile(null);
         setError(null);
+        // Limpia persistencia física
+        authService.logout(); 
     };
 
     const updateProfile = async (updatedData) => {
@@ -61,16 +89,22 @@ export const AuthProvider = ({ children }) => {
         const updatedProfile = await profileService.patchUserProfile(user.id, updatedData);
         setProfile(updatedProfile);
         return updatedProfile;
-    }
+    };
 
     const updateUsername = async (newUsername) => {
         if (!user) throw new Error('No hay usuario logueado');
-        await authService.updateUsername(user.username, newUsername);
+        
+        await authService.updateUsername(newUsername);
+        
         const updatedUser = { ...user, username: newUsername };
         setUser(updatedUser);
+        
         if (profile) {
             setProfile({ ...profile, username: newUsername });
         }
+
+        localStorage.setItem('username', newUsername);
+
         return updatedUser;
     };
 

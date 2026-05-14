@@ -27,6 +27,11 @@ dependencies {
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	
+	// Json Web Token (JWT) de Auth0
+	implementation("com.auth0:java-jwt:4.4.0")
+
+	implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
 }
 
 kotlin {

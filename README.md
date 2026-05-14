@@ -1,71 +1,119 @@
 # Arquitectura del sistema
 ![Diagrama de Arquitectura](./docs/diagrama_sistema.jpg)
-Realizado en draw.io
 
-# 💻 Stack Tecnológico
+## Descripción
+Proyecto de microservicios con un BFF que centraliza autenticación y datos de perfil para el frontend.
 
-## Frontend
-* **React 19.2.5:** Biblioteca principal para la construcción de interfaces de usuario interactivas.
-* **Node 24.15.0:** Entorno de ejecución para JavaScript utilizado para la gestión de dependencias y el servidor de desarrollo.
-* **Vite:** Entorno de desarrollo ultrarrápido y empaquetador para el frontend.
-* **Context API:** Herramienta nativa de React utilizada para la gestión del estado global (evitando el uso de dependencias externas pesadas).
+## Arquitectura
+El proyecto está compuesto por los siguientes servicios:
+- `frontend-service`: aplicación React + Vite
+- `bff-service`: gateway que valida JWT y reenvía peticiones
+- `auth-service`: emite y valida JWT
+- `profile-service`: gestiona perfiles de usuario
+- `donations-service`: microservicio de donaciones (skeleton)
+- `inventory-service`: microservicio de inventario (skeleton)
+- `logistic-service`: microservicio de logística (skeleton)
+- Bases de datos PostgreSQL para cada microservicio
 
-## Backend
-* **Kotlin 2.2.21:** Lenguaje de programación principal, elegido por su seguridad, concisión y modernidad.
-* **Spring Boot 4.0.5:** Framework base para la creación de la API REST y la gestión de microservicios.
-* **JDK 21:** Versión de soporte a largo plazo (LTS) utilizada como entorno de ejecución.
+## Tecnologías
+### Frontend
+- React 19.2.5
+- Vite 8.0.10
+- Tailwind CSS 4.3.0
+- Node.js
 
-## Infraestructura y Datos
-* **Docker:** Utilizado para la contenerización de los servicios, garantizando que el proyecto funcione igual en cualquier entorno.
-* **Docker Compose:** Herramienta de orquestación para levantar simultáneamente el frontend, backend y bases de datos con un solo comando.
-* **PostgreSQL 18:** Motor de base de datos relacional robusto asignado a cada microservicio para la persistencia de datos.
+### Backend
+- Kotlin 2.2.21
+- Spring Boot 4.0.5
+- JDK 21
+- Spring Data JPA
+- JJWT
 
-# 🏗️ Patrones de Arquitectura y Diseño
-## Backend (Kotlin / Spring Boot)
-El backend utiliza patrones estructurales y de comportamiento para gestionar la seguridad y la respuesta lógica del sistema de emergencias:
+### Infraestructura
+- Docker
+- Docker Compose
+- PostgreSQL 16
 
-* **Patrón Strategy (Estrategia)**: Implementado mediante RoleBasedAuthenticationStrategy. Este patrón centraliza las reglas de validación de acceso, permitiendo aplicar políticas de seguridad diferenciadas según el rol del usuario (ADMIN, LOGISTIC, VOLUNTEER, DONOR). Facilita la futura integración de hashing (BCrypt) sin alterar el flujo del controlador.
+## Arquetipos de Arquitectura
+Los arquetipos son patrones estructurales a nivel de arquitectura del sistema:
 
-* **Patrón Factory (Fábrica)**: Localizado en AuthResponseFactory. Se encarga de la creación lógica del objeto AuthResponse, vinculando el rol del usuario con su correspondiente "Estrategia de Dashboard" (dashboardType). Esto asegura que el backend determine la experiencia de usuario de forma centralizada.
+- **Microservicios**: servicios independientes por responsabilidad (`auth-service`, `profile-service`, `donations-service`, `inventory-service`, `logistic-service`) con despliegue y base de datos aislados en Docker Compose.
+  
+- **BFF (Backend For Frontend)**: puerta única del frontend (`bff-service/`) que centraliza autorización con JWT y actúa como gateway para reenviar peticiones a los microservicios internos.
 
-* **Patrón Repository (Repositorio)**: Representado por la interfaz UserRepository. Actúa como una capa de abstracción entre la lógica de negocio y el origen de los datos. Esta mediación permite gestionar el acceso y la actualización de la información de forma independiente a la tecnología de persistencia utilizada, facilitando la escalabilidad y el mantenimiento del sistema.
+## Patrones de Diseño
+Los patrones son soluciones específicas implementadas en el código:
 
-## Frontend (React / Vite)
-El frontend se basa en una arquitectura modular y reactiva:
+- **JWT Authentication**: flujo stateless donde el token portador se valida en el BFF mediante `JwtValidationFilter` y se emite en `auth-service` mediante `JwtService`.
 
-* **Patrón Provider / Context (Contexto)**: Mediante AuthContext, se gestiona un estado global complejo que almacena la identidad, el rol y los permisos del usuario. Esto elimina el prop drilling y garantiza la integridad de la sesión en toda la plataforma.
+- **Repository Pattern**: acceso a datos abstracto a través de interfaces `JpaRepository`. Implementado en: `auth-service` y `profile-service`.
 
-* **Arquitectura Modular Basada en Componentes**: Se ha implementado una capa de servicios (authService.js) que encapsula toda la lógica de comunicación con la API. Los componentes no conocen detalles de red, lo que permite un mantenimiento simplificado y alta reutilización de código.
+- **Strategy Pattern**: autenticación configurable mediante estrategias de validación. Definido en `auth-service` con implementaciones `SimplePasswordStrategy` y `EnhancedSecurityStrategy` que permiten cambiar el método de autenticación sin modificar el controlador.
 
-* **Strategy Mapping (UI)**: El sistema utiliza un mapeo de componentes para renderizar dashboards especializados según el rol. Esto permite que la vista de perfil (Profile) delegue la interfaz específica a módulos independientes (AdminDashboard, DonorDashboard, etc.), cumpliendo con el principio de responsabilidad única.
+- **Factory Pattern**: creación centralizada de respuestas de autenticación en `auth-service`, usado por `AuthController` para construir `AuthResponse` con los datos del usuario y token.
 
-# 📈 Metodología de Trabajo: Git Flow
-Para la gestión del código fuente, hemos adoptado el arquetipo Git Flow, organizando el desarrollo en las siguientes ramas:
+- **Provider / Context Pattern**: gestión de estado de sesión en React mediante `AuthContext`. Proporciona `AuthProvider` y hook `useAuth()` para acceder al estado de autenticación en toda la aplicación sin prop drilling.
 
-* **Master**: Contiene el código de producción estable.
+## Flujo de autenticación
+1. El frontend envía credenciales a `POST http://localhost:8080/api/auth/login`
+2. El `bff-service` reenvía la solicitud a `auth-service`
+3. `auth-service` genera un JWT con `id` y `username`
+4. El frontend guarda el token en `localStorage`
+5. Las peticiones posteriores al BFF incluyen `Authorization: Bearer <token>`
+6. El BFF valida el JWT antes de reenviar a los servicios internos
 
-* **Develop**: Rama principal para la integración de nuevas funcionalidades.
+## Servicios principales y endpoints expuestos
+### `auth-service`
+- `POST /api/auth/login`
+- `POST /api/auth/update-username`
 
-* **Feature Branches**: Ramas temporales para el desarrollo de características específicas (ej. feature/auth-implementation).
+### `bff-service`
+- `POST /api/auth/login`
+- `POST /api/auth/update-username`
+- `GET /api/profile/{userId}`
+- `PATCH /api/profile/{userId}`
 
-**Hotfixes**: Ramas para correcciones críticas inmediatas.
+### `profile-service`
+- `GET /api/profile/{userId}`
+- `PATCH /api/profile/{userId}`
 
-# 🚀 Instalación y Ejecución
-**Requisitos Previos**
-* JDK 21
-* Node.js (versión LTS)
-
-**Backend**
+## Ejecución con Docker Compose
 ```bash
-cd auth-service
-./gradlew bootRun
+docker compose up --build
 ```
 
-**Frontend**
+Una vez que se levanten los servicios:
+- Frontend: `http://localhost:5173`
+- BFF: `http://localhost:8080`
+
+## Ejecución del proyecto
+El proyecto completo debe levantarse con Docker Compose, ya que los servicios con bases de datos dependen de secrets y credenciales que no están preconfiguradas para ejecución local directa.
+
+### Frontend local
+El frontend puede ejecutarse localmente para desarrollo, pero para una integración completa se requiere que el BFF y los servicios backend estén levantados con Docker Compose.
 ```bash
-cd frontend
+cd frontend-service
 npm install
 npm run dev
 ```
 
-**Nota**: Proyecto aún no testeado en Linux/macOS.
+### Backend completo con Docker Compose
+```bash
+docker compose up --build
+```
+
+## Variables de entorno clave
+- `JWT_SECRET`
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_DRIVER_CLASS_NAME`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
+- `SERVICES_AUTH_URL`
+- `SERVICES_PROFILE_URL`
+
+## Notas
+- El sistema usa PostgreSQL 16 en Docker Compose.
+- El frontend consume el BFF en `http://localhost:8080`.
+- Los servicios con base de datos requieren los secrets y variables de entorno definidos en `docker-compose.yml`.
+- El despliegue completo debe ejecutarse con `docker compose up --build`.
+- Los microservicios `donations-service`, `inventory-service` y `logistic-service` están actualmente como esqueleto y pueden ampliarse con controladores REST adicionales.

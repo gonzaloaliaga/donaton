@@ -39,6 +39,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
 	implementation("org.flywaydb:flyway-database-postgresql")
 
+	// Json Web Token (JWT) de Auth0
+	implementation("com.auth0:java-jwt:4.4.0")
+
 	annotationProcessor("org.projectlombok:lombok")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
